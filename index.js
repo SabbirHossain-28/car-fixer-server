@@ -24,6 +24,7 @@ async function run() {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
     const serviceCollection = client.db("carFixerDB").collection("services");
+    const bookingCollection=client.db("carFixerDB").collection("bookedservices")
 
     app.get("/services", async (req, res) => {
       const cursor = serviceCollection.find();
@@ -35,11 +36,20 @@ async function run() {
       const id = req.params.id;
       const query = { _id: new ObjectId(id) };
       const options = {
-        projection: { title: 1, price: 1, service_id: 1 },
+        projection: { title: 1, price: 1, service_id: 1,img:1 },
       };
       const result = await serviceCollection.findOne(query, options);
       res.send(result);
     });
+
+    // ------------------------------------------------------------------
+
+    app.post("/bookings", async(req,res)=>{
+      const bookings=req.body;
+      const result=await bookingCollection.insertOne(bookings);
+      res.send(result);
+      console.log(bookings);
+    })
 
     // Send a ping to confirm a successful connection
     // await client.db("admin").command({ ping: 1 });
