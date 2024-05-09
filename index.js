@@ -10,10 +10,19 @@ const port = process.env.PORT || 5000;
 app.use(express.json());
 app.use(
   cors({
-    origin: ["http://localhost:5173"],
+    origin: [
+      "http://localhost:5173",
+      "car-fixer-project.web.app",
+      "car-fixer-project.firebaseapp.com",
+    ],
     credentials: true,
   })
 );
+const cookieOption={
+  httpOnly: true,
+  secure: process.env.NODE_ENV==="production"?true:false,
+  sameSite: process.env.NODE_ENV==="production"?"none":"strict",
+}
 app.use(cookieParser());
 
 // MiddleWare >===>
@@ -45,7 +54,7 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
-    await client.connect();
+    // await client.connect();
     const serviceCollection = client.db("carFixerDB").collection("services");
     const bookingCollection = client
       .db("carFixerDB")
@@ -57,18 +66,14 @@ async function run() {
         expiresIn: "2h",
       });
       res
-        .cookie("accessToken", token, {
-          httpOnly: true,
-          secure: true,
-          sameSite: "none",
-        })
+        .cookie("accessToken", token,cookieOption )
         .send({ success: true });
     });
 
     app.post("/logout", async (req, res) => {
       const userInfo = req.body;
       console.log("logginOut action from cliend side", userInfo);
-      res.clearCookie("accessToken", { maxAge: 0 }).send({ success: true });
+      res.clearCookie("accessToken", { ...cookieOption,maxAge: 0 }).send({ success: true });
     });
 
     app.get("/services", async (req, res) => {
