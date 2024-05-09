@@ -12,8 +12,8 @@ app.use(
   cors({
     origin: [
       "http://localhost:5173",
-      "car-fixer-project.web.app",
-      "car-fixer-project.firebaseapp.com",
+      "https://car-fixer-project.web.app",
+      // "car-fixer-project.firebaseapp.com",
     ],
     credentials: true,
   })
