@@ -77,7 +77,16 @@ async function run() {
     });
 
     app.get("/services", async (req, res) => {
-      const cursor = serviceCollection.find();
+      const sort=req.query;
+      const sortDataInt=parseInt(sort.sort)
+      console.log("sort res",sort);
+      const query={};
+      const options={
+        sort:{
+          price:sort.sort==="asc"?1:-1,
+        }
+      }
+      const cursor = serviceCollection.find(query,options);
       const result = await cursor.toArray();
       res.send(result);
     });
